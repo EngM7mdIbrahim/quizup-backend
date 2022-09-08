@@ -93,7 +93,6 @@ authRouter.post("/signin", async (req, res) => {
   if (match) {
     const accessToken = generateAccessToken(
       existingUser.id,
-      existingUser.email,
       existingUser.name
     );
     // const refreshToken = generateRefreshToken(

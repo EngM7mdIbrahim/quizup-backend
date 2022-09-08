@@ -7,8 +7,9 @@ const quizSchema = new mongoose.Schema({
   },
   tag: {
     type: String,
-    default: 'General'
+    default: "General",
   },
+  teacherID: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   questions: [
     new mongoose.Schema({
       question: {
@@ -17,7 +18,7 @@ const quizSchema = new mongoose.Schema({
       choices: [
         {
           type: String,
-          default: '',
+          default: "",
         },
       ],
       correctAnswer: {
@@ -28,8 +29,8 @@ const quizSchema = new mongoose.Schema({
   ],
   lastEdit: {
     type: Date,
-    default: Date.now
-}
+    default: Date.now,
+  },
 });
 
 module.exports = mongoose.model("Quiz", quizSchema);

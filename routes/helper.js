@@ -38,8 +38,8 @@ const generatePayloadForTokens = (userID, email = "", name = "") => {
   };
 };
 
-const generateAccessToken = (userID, email = "", name = "") => {
-  const payload = generatePayloadForTokens(userID, email, name);
+const generateAccessToken = (userID, name = "") => {
+  const payload = generatePayloadForTokens(userID, name);
   const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
     expiresIn: process.env.ACCESS_TOKEN_EXPIRATION_TIME
   });

@@ -13,7 +13,7 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    templates: [{type: mongoose.Schema.Types.ObjectId, ref: 'Ad'}],
+    quizzes: [{type: mongoose.Schema.Types.ObjectId, ref: 'Quiz'}],
     classes: [{type: mongoose.Schema.Types.ObjectId, ref: 'Class'}],
     // refreshToken: {
     //     type: String,

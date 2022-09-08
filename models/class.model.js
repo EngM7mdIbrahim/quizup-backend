@@ -7,7 +7,11 @@ const classSchema = new mongoose.Schema({
     },
     templateID: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Template'
+        ref: 'Quiz'
+    },
+    teacherID: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
     },
     players: [{
         name: {

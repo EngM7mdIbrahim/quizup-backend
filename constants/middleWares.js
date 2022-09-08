@@ -9,6 +9,8 @@ const authAccessToken = (req, res, next) => {
   try {
     const token = auth.split(" ")[1];
     const payload = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    console.log('Payload: ',payload)
+    req.userID = payload.id;
   } catch (e) {
     return res
       .status(403)

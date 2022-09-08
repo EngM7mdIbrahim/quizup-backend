@@ -1,15 +1,18 @@
 const quizzesRouter = require("express").Router();
+const mongoose = require("mongoose");
 const User = require("../models/user.model.js");
-const Quiz = require('../models/quiz.model')
+const Quiz = require("../models/quiz.model");
 const {
   getErrorBody,
   validateProperties,
   getSuccessBody,
 } = require("./helper");
 
-quizzesRouter.get("/", async (_, res) => {
+quizzesRouter.get("/", async (req, res) => {
   try {
-    const quizzes = await Quiz.find({});
+    const quizzes = await Quiz.find({
+      teacherID: mongoose.Types.ObjectId(req.userID),
+    });
     res.status(200).send(quizzes);
   } catch (e) {
     res.status(500).send(getErrorBody(e.message));
@@ -94,36 +97,36 @@ quizzesRouter.get("/", async (_, res) => {
 //   }
 // });
 
-// quizzesRouter.delete("/:id", async (req, res) => {
-//   const { id } = req.params;
-//   const checkMessage = validateProperties(req.params, ["id"]);
-//   if (checkMessage) {
-//     res.status(400).send(getErrorBody(checkMessage));
-//     return;
-//   }
-//   try {
-//     const existingAd = await Ad.findOne({ _id: id });
-//     if (!existingAd) {
-//       res.status(401).send(getErrorBody("There is no ad with this id."));
-//       return;
-//     }
-//     const existingSeller = await User.findOne({ _id: existingAd.sellerID });
-//     await existingSeller
-//       .$set({
-//         ads: existingSeller.ads.filter((ad) => {
-//           return ad.toString() !== existingAd.id;
-//         }),
-//       })
-//       .save();
-//     await Ad.deleteOne({ _id: existingAd._id });
-//     res.status(200).send(getSuccessBody("The ad is deleted successfully!"));
-//   } catch (e) {
-//     res
-//       .status(401)
-//       .send(getErrorBody("There is no ad with this id." + e.message));
-//     return;
-//   }
-// });
+quizzesRouter.delete("/:id", async (req, res) => {
+  const { id } = req.params;
+  const checkMessage = validateProperties(req.params, ["id"]);
+  if (checkMessage) {
+    res.status(400).send(getErrorBody(checkMessage));
+    return;
+  }
+  try {
+    const existingQuiz = await Quiz.findOne({ _id: id });
+    if (!existingQuiz) {
+      res.status(401).send(getErrorBody("There is no quiz with this id."));
+      return;
+    }
+    const exisitngTeacher = await User.findOne({ _id: existingQuiz.teacherID });
+    await exisitngTeacher
+      .$set({
+        quizzes: exisitngTeacher.quizzes.filter((quiz) => {
+          return quiz.toString() !== existingQuiz.id;
+        }),
+      })
+      .save();
+    await Quiz.deleteOne({ _id: existingQuiz._id });
+    res.status(200).send(getSuccessBody("The Quiz is deleted successfully!"));
+  } catch (e) {
+    res
+      .status(401)
+      .send(getErrorBody("There is no Quiz with this id." + e.message));
+    return;
+  }
+});
 
 // quizzesRouter.post("/:id", async (req, res) => {
 //   const { buyerID } = req.body;

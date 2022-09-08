@@ -7,7 +7,7 @@ var cors = require('cors');
 // All router imports
 const authRouter = require("./routes/auth.route.js");
 const quizzesRouter = require('./routes/quizzes.route');
-// const categoriesRouter = require('./routes/categories.route.js');
+const classesRouter = require('./routes/classes.route.js');
 const { authAccessToken } = require("./constants/middleWares");
 
 //setup
@@ -26,6 +26,6 @@ app.use(cors())
 app.use("/auth", authRouter);
 app.use(authAccessToken);
 app.use('/quizzes', quizzesRouter);
-// app.use('/categories', categoriesRouter);
+app.use('/classes', classesRouter);
 
 app.listen(8000);

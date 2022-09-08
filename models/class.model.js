@@ -5,7 +5,7 @@ const classSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    templateID: {
+    quizID: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Quiz'
     },

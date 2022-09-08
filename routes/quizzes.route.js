@@ -10,9 +10,11 @@ const {
 
 quizzesRouter.get("/", async (req, res) => {
   try {
+    console.log("UserID: ",mongoose.Types.ObjectId(req.userID));
     const quizzes = await Quiz.find({
-      teacherID: mongoose.Types.ObjectId(req.userID),
+       'teacherID':  req.userID,
     });
+    console.log(quizzes)
     res.status(200).send(quizzes);
   } catch (e) {
     res.status(500).send(getErrorBody(e.message));

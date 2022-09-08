@@ -6,8 +6,8 @@ var cors = require('cors');
 
 // All router imports
 const authRouter = require("./routes/auth.route.js");
-const adsRouter = require('./routes/ads.route.js');
-const categoriesRouter = require('./routes/categories.route.js');
+const quizzesRouter = require('./routes/quizzes.route');
+// const categoriesRouter = require('./routes/categories.route.js');
 const { authAccessToken } = require("./constants/middleWares");
 
 //setup
@@ -25,7 +25,7 @@ app.use(cors())
 //Use all routes
 app.use("/auth", authRouter);
 app.use(authAccessToken);
-app.use('/ads', adsRouter);
-app.use('/categories', categoriesRouter);
+app.use('/quizzes', quizzesRouter);
+// app.use('/categories', categoriesRouter);
 
 app.listen(8000);

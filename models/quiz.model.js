@@ -1,9 +1,13 @@
 const mongoose = require("mongoose");
 
-const templateSchema = new mongoose.Schema({
+const quizSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
+  },
+  tag: {
+    type: String,
+    default: 'General'
   },
   questions: [
     new mongoose.Schema({
@@ -28,4 +32,4 @@ const templateSchema = new mongoose.Schema({
 }
 });
 
-module.exports = mongoose.model("Template", templateSchema);
+module.exports = mongoose.model("Quiz", quizSchema);

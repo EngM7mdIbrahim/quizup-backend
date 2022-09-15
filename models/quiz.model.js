@@ -21,6 +21,10 @@ const quizSchema = new mongoose.Schema({
           default: "",
         },
       ],
+      image: {
+        type: String,
+        default: null
+      },
       correctAnswer: {
         type: Number,
         default: 0,

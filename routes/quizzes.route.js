@@ -6,98 +6,95 @@ const {
   getErrorBody,
   validateProperties,
   getSuccessBody,
+  validateQuestion,
+  sendGeneralError
 } = require("./helper");
 
 quizzesRouter.get("/", async (req, res) => {
   try {
-    console.log("UserID: ",mongoose.Types.ObjectId(req.userID));
+    console.log("UserID: ", mongoose.Types.ObjectId(req.userID));
     const quizzes = await Quiz.find({
-       'teacherID':  req.userID,
+      teacherID: req.userID,
     });
-    console.log(quizzes)
+    console.log(quizzes);
     res.status(200).send(quizzes);
   } catch (e) {
     res.status(500).send(getErrorBody(e.message));
   }
 });
 
-// quizzesRouter.post("/", async (req, res) => {
-//   const { title, sellerID, categoryID, price, description } = req.body;
-//   const checkMessage = validateProperties(req.body, [
-//     "title",
-//     "sellerID",
-//     "categoryID",
-//     "price",
-//   ]);
-//   if (checkMessage) {
-//     res.status(400).send(getErrorBody(checkMessage));
-//     return;
-//   }
-//   try {
-//     const existingAd = await Ad.findOne({ title });
-//     if (existingAd) {
-//       res
-//         .status(401)
-//         .send(
-//           getErrorBody(
-//             "There is already an ad with the same title. Please change the title"
-//           )
-//         );
-//       return;
-//     }
+quizzesRouter.post("/", async (req, res) => {
+  const { name, tag, questions } = req.body;
+  const teacherID = req.userID;
+  const checkMessage = validateProperties(req.body, [
+    "name",
+    "tag",
+    "questions",
+  ]);
+  if (checkMessage) {
+    res.status(400).send(getErrorBody(checkMessage));
+    return;
+  }
 
-//     const existingCategory = await Category.findOne({ _id: categoryID });
-//     if (!existingCategory) {
-//       res.status(401).send(getErrorBody("This category doesn't exist!"));
-//       return;
-//     }
-//     if (!existingCategory.active) {
-//       res
-//         .status(401)
-//         .send(
-//           getErrorBody(
-//             "This category is already deleted, cannot post ad to it!"
-//           )
-//         );
-//       return;
-//     }
+  if (!Array.isArray(questions)) {
+    res
+      .status(400)
+      .send(getErrorBody("'questions' attribute should be an array."));
+    return;
+  }
 
-//     const existingSeller = await User.findOne({ _id: sellerID });
-//     if (!existingSeller) {
-//       res
-//         .status(401)
-//         .send(
-//           getErrorBody(
-//             "This seller is not registered yet, please signup and then continue!"
-//           )
-//         );
-//       return;
-//     }
+  let i = 0;
+  try {
+    questions.forEach((question) => {
+      if (!validateQuestion(question, res, i)) {
+        throw Error();
+      }
+      i++;
+    });
+  } catch (e) {
+    return;
+  }
 
-//     if (price < 0) {
-//       res.status(401).send(getErrorBody("Please enter a valid selling price!"));
-//       return;
-//     }
+  try {
+    const existingQuiz = await Quiz.findOne({ name });
+    if (existingQuiz) {
+      res
+        .status(401)
+        .send(
+          getErrorBody(
+            "There is already a quiz template with the same name. Please change the name"
+          )
+        );
+      return;
+    }
 
-//     const savedAd = await new Ad({
-//       title,
-//       price,
-//       sellerID,
-//       categoryID,
-//       description,
-//     }).save();
-//     await existingSeller
-//       .$set({ ads: [...existingSeller.ads, savedAd.id] })
-//       .save();
-//     res
-//       .status(201)
-//       .send({ message: "Ad Posted successfully!", id: savedAd.id });
-//     return;
-//   } catch (e) {
-//     sendGeneralError(e, res);
-//     return;
-//   }
-// });
+    const existingTeacher = await User.findOne({ _id: teacherID });
+    if (!existingTeacher) {
+      res.status(401).send(getErrorBody("This teacher doesn't exist!"));
+      return;
+    }
+
+    const savedQuiz = await new Quiz({
+      name,
+      tag,
+      teacherID,
+      questions,
+    }).save();
+
+    await existingTeacher
+      .$set({ ads: [...existingTeacher.quizzes, savedQuiz.id] })
+      .save();
+    res.status(201).send({
+      message: "Quiz Template Added successfully!",
+      id: savedQuiz.id,
+      questions: savedQuiz.questions.map((question) => question._id),
+    });
+    return;
+  } catch (e) {
+    sendGeneralError(e, res);
+    return;
+  }
+});
 
 quizzesRouter.delete("/:id", async (req, res) => {
   const { id } = req.params;

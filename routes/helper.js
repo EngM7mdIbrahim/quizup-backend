@@ -54,6 +54,46 @@ const generateRefreshToken = (userID, email = "", name = "") => {
   return accessToken;
 };
 
+const validateQuestion = (question, res, i)=>{
+  const checkMessage = validateProperties(question, [
+    "question",
+    "choices",
+    "correctAnswer",
+  ]);
+  if (checkMessage) {
+    res
+      .status(400)
+      .send(getErrorBody(`${checkMessage} at question number ${i + 1}`));
+    return false;
+  }
+  const { choices } = question;
+  if (!Array.isArray(choices)) {
+    res
+      .status(400)
+      .send(
+        getErrorBody(
+          `'choices' attribute should in question number ${
+            i + 1
+          } be an array.`
+        )
+      );
+    return false;
+  }
+  if(choices.length !== 4 && choices.length !== 2){
+    res
+      .status(400)
+      .send(
+        getErrorBody(
+          `Invalid qustion type at question number ${
+            i + 1
+          }, either send a true / false question or a choices question. Check the choices array.`
+        )
+      );
+    return false;
+  }
+  return true;
+}
+
 //Snippets
 
 // catch(e){
@@ -68,4 +108,5 @@ module.exports = {
   getSuccessBody,
   generateAccessToken,
   generateRefreshToken,
+  validateQuestion,
 };

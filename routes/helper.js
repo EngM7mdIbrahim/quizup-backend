@@ -1,4 +1,7 @@
 const jwt = require("jsonwebtoken");
+const fs = require("fs");
+const path = require('path')
+const { UPLOAD_FILES_DIR } = require("../constants/cosntants");
 
 const getErrorBody = (message) => {
   return {
@@ -41,20 +44,20 @@ const generatePayloadForTokens = (userID, email = "", name = "") => {
 const generateAccessToken = (userID, name = "") => {
   const payload = generatePayloadForTokens(userID, name);
   const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
-    expiresIn: process.env.ACCESS_TOKEN_EXPIRATION_TIME
+    expiresIn: process.env.ACCESS_TOKEN_EXPIRATION_TIME,
   });
   return accessToken;
 };
 
 const generateRefreshToken = (userID, email = "", name = "") => {
   const payload = generatePayloadForTokens(userID, email, name);
-  const accessToken = jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET,{
+  const accessToken = jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET, {
     expiresIn: process.env.REFESH_TOKEN_EXPIRATION_TIME,
   });
   return accessToken;
 };
 
-const validateQuestion = (question, res, i)=>{
+const validateQuestion = (question, res, i) => {
   const checkMessage = validateProperties(question, [
     "question",
     "choices",
@@ -72,14 +75,12 @@ const validateQuestion = (question, res, i)=>{
       .status(400)
       .send(
         getErrorBody(
-          `'choices' attribute should in question number ${
-            i + 1
-          } be an array.`
+          `'choices' attribute should in question number ${i + 1} be an array.`
         )
       );
     return false;
   }
-  if(choices.length !== 4 && choices.length !== 2){
+  if (choices.length !== 4 && choices.length !== 2) {
     res
       .status(400)
       .send(
@@ -92,7 +93,22 @@ const validateQuestion = (question, res, i)=>{
     return false;
   }
   return true;
-}
+};
+
+const deleteImages = (questionIDs) => {
+  const files = fs.readdirSync(UPLOAD_FILES_DIR);
+  files.forEach((file) => {
+    for (let i = 0; i < questionIDs.length; i++) {
+      if (file.toString().includes(questionIDs[i])) {
+        console.log("Deleteing file:", file);
+        fs.unlink(path.join(UPLOAD_FILES_DIR, file.toString()), err =>{
+          if(err) throw err;
+          console.log('File deleted successfully!');
+        });
+      }
+    }
+  });
+};
 
 //Snippets
 
@@ -109,4 +125,5 @@ module.exports = {
   generateAccessToken,
   generateRefreshToken,
   validateQuestion,
+  deleteImages,
 };

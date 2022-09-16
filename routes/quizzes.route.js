@@ -8,7 +8,8 @@ const {
   validateProperties,
   getSuccessBody,
   validateQuestion,
-  sendGeneralError
+  sendGeneralError,
+  deleteImages
 } = require("./helper");
 
 quizzesRouter.get("/", async (req, res) => {
@@ -116,6 +117,12 @@ quizzesRouter.delete("/:id", async (req, res) => {
         }),
       })
       .save();
+    
+
+    //Delete Images
+    const questionIDs = existingQuiz.questions.map(question =>question._id);
+    deleteImages(questionIDs)
+
     await Quiz.deleteOne({ _id: existingQuiz._id });
     res.status(200).send(getSuccessBody("The Quiz is deleted successfully!"));
   } catch (e) {
@@ -169,7 +176,7 @@ quizzesRouter.delete("/:id", async (req, res) => {
 // });
 
 quizzesRouter.post('/upload',uploadManager.array('images',50), (req,res)=>{
-  console.log(req.files)
+  
   res.status(200).send(getSuccessBody('Files saved sucessfully!'))
 } )
 

@@ -68,7 +68,6 @@ authRouter.post("/signup", async (req, res) => {
 });
 
 authRouter.post("/signin", async (req, res) => {
-  console.log('Received!')
   const { email, password } = req.body;
   if (!email || !password) {
     res.status(401).send(getErrorBody("All fields are required!"));

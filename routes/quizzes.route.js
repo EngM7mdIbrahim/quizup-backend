@@ -2,6 +2,7 @@ const quizzesRouter = require("express").Router();
 const mongoose = require("mongoose");
 const User = require("../models/user.model.js");
 const Quiz = require("../models/quiz.model");
+const {uploadManager} = require('../constants/middleWares')
 const {
   getErrorBody,
   validateProperties,
@@ -12,11 +13,9 @@ const {
 
 quizzesRouter.get("/", async (req, res) => {
   try {
-    console.log("UserID: ", mongoose.Types.ObjectId(req.userID));
     const quizzes = await Quiz.find({
       teacherID: req.userID,
     });
-    console.log(quizzes);
     res.status(200).send(quizzes);
   } catch (e) {
     res.status(500).send(getErrorBody(e.message));
@@ -127,7 +126,7 @@ quizzesRouter.delete("/:id", async (req, res) => {
   }
 });
 
-// quizzesRouter.post("/:id", async (req, res) => {
+// quizzesRouter.post("/edit/:id", async (req, res) => {
 //   const { buyerID } = req.body;
 //   const { id } = req.params;
 //   const checkBody = { ...req.body, ...req.params };
@@ -169,62 +168,9 @@ quizzesRouter.delete("/:id", async (req, res) => {
 //   }
 // });
 
-// quizzesRouter.post("/:id/close/:buyerId", async (req, res) => {
-//   const { id, buyerId } = req.params;
-//   const checkMessage = validateProperties(req.params, ["buyerId", "id"]);
-//   if (checkMessage) {
-//     res.status(400).send(getErrorBody(checkMessage));
-//     return;
-//   }
-//   try {
-//     const existingAd = await Ad.findById(id);
-//     if (!existingAd) {
-//       res.status(401).send(getErrorBody("There is no ad with this ID."));
-//       return;
-//     }
-
-//     const existingBuyer = await User.findById(buyerId);
-//     if (!existingBuyer) {
-//       res
-//         .status(401)
-//         .send(
-//           getErrorBody(
-//             "This buyer is not registered yet, please signup and then continue!"
-//           )
-//         );
-//       return;
-//     }
-
-//     if (!existingAd.interestedBuyers.includes(buyerId)) {
-//       res
-//         .status(402)
-//         .send(
-//           getErrorBody(
-//             "You should be interested first before closing a deal to you!"
-//           )
-//         );
-//       return;
-//     }
-
-//     await existingAd
-//       .$set({
-//         finalBuyerID: buyerId,
-//       })
-//       .save();
-
-//     res
-//       .status(201)
-//       .send({
-//         message: "The deal is closed!",
-//         adID: existingAd.id,
-//         sellerID: existingAd.sellerID,
-//         buyerID: buyerId,
-//       });
-//     return;
-//   } catch (e) {
-//     sendGeneralError(e, res);
-//     return;
-//   }
-// });
+quizzesRouter.post('/upload',uploadManager.array('images',50), (req,res)=>{
+  console.log(req.files)
+  res.status(200).send(getSuccessBody('Files saved sucessfully!'))
+} )
 
 module.exports = quizzesRouter;

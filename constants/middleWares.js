@@ -46,6 +46,7 @@ const storage = multer.diskStorage({
     console.log('Images Meta: ',req.body.imagesMeta);
     console.log('Images: ', req.files);
     console.log('Image: ',file.originalname)
+    file.originalname.includes
     cb(null, file.originalname)
   }
 });

@@ -1,16 +1,18 @@
 const quizzesRouter = require("express").Router();
 const mongoose = require("mongoose");
+const path = require("path");
 const User = require("../models/user.model.js");
 const Quiz = require("../models/quiz.model");
-const {uploadManager} = require('../constants/middleWares')
+const { uploadManager } = require("../constants/middleWares");
 const {
   getErrorBody,
   validateProperties,
   getSuccessBody,
   validateQuestion,
   sendGeneralError,
-  deleteImages
+  deleteImages,
 } = require("./helper");
+const { UPLOAD_FILES_BASE_URL } = require("../constants/cosntants.js");
 
 quizzesRouter.get("/", async (req, res) => {
   try {
@@ -55,8 +57,25 @@ quizzesRouter.post("/", async (req, res) => {
     return;
   }
 
-  try {
-    const existingQuiz = await Quiz.findOne({ name });
+  try {  
+    const existingTeacher = await User.findOne({ _id: teacherID });
+    if (!existingTeacher) {
+      res.status(401).send(getErrorBody("This teacher doesn't exist!"));
+      return;
+    }
+
+    if(req.body._id){
+      let {_id} = req.body;
+      let savedQuiz = await Quiz.findOneAndUpdate({_id},req.body, {upsert: true});
+      res.status(201).send({
+        message: "Quiz Template Updated successfully!",
+        id: savedQuiz.id,
+        questions: savedQuiz.questions.map((question) => question._id),
+      });
+      return;
+    }
+
+    let existingQuiz = await Quiz.findOne({ name });
     if (existingQuiz) {
       res
         .status(401)
@@ -65,12 +84,6 @@ quizzesRouter.post("/", async (req, res) => {
             "There is already a quiz template with the same name. Please change the name"
           )
         );
-      return;
-    }
-
-    const existingTeacher = await User.findOne({ _id: teacherID });
-    if (!existingTeacher) {
-      res.status(401).send(getErrorBody("This teacher doesn't exist!"));
       return;
     }
 
@@ -117,11 +130,10 @@ quizzesRouter.delete("/:id", async (req, res) => {
         }),
       })
       .save();
-    
 
     //Delete Images
-    const questionIDs = existingQuiz.questions.map(question =>question._id);
-    deleteImages(questionIDs)
+    const questionIDs = existingQuiz.questions.map((question) => question._id);
+    deleteImages(questionIDs);
 
     await Quiz.deleteOne({ _id: existingQuiz._id });
     res.status(200).send(getSuccessBody("The Quiz is deleted successfully!"));
@@ -175,9 +187,41 @@ quizzesRouter.delete("/:id", async (req, res) => {
 //   }
 // });
 
-quizzesRouter.post('/upload',uploadManager.array('images',50), (req,res)=>{
-  
-  res.status(200).send(getSuccessBody('Files saved sucessfully!'))
-} )
+quizzesRouter.post(
+  "/upload",
+  uploadManager.array("images", 50),
+  async (req, res) => {
+    console.log(req.files);
+    const existingQuiz = await Quiz.findById(req.body.quizID);
+    if(!existingQuiz){
+      res.status(400).send(getErrorBody('The quiz id that you have sent is not found!'))
+    }
+    req.files.fin
+    //Update the image URLS in the quiz template
+    await existingQuiz.$set({
+      questions: existingQuiz.questions.map((question) => {
+        let fileIndex = req.files.findIndex((file) =>
+          file.originalname.includes(question._id)
+        );
+        if (fileIndex == -1){
+          console.log('Cannot find the asked question')
+          return question;
+        } 
+        console.log('Found the qustion and the file name!')
+        let x =  {
+          ...question,
+          image: `${UPLOAD_FILES_BASE_URL}${question._id.toString()}${path.extname(
+            req.files[fileIndex].originalname
+          )}`,
+        
+        };
+        console.log(x)
+        return x
+      }).filter(question=>question),
+    }).save();
+
+    res.status(200).send(getSuccessBody("Files are saved sucessfully!"));
+  }
+);
 
 module.exports = quizzesRouter;

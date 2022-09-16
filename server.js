@@ -3,7 +3,7 @@ const app = express();
 const mongoose = require("mongoose");
 const multer = require('multer');
 const path = require('path')
-const {DB_CONN_STRING, DB_LOCAL_CONN_STRING, UPLOAD_FILES_DIR} = require("./constants/cosntants");
+const {DB_CONN_STRING, DB_LOCAL_CONN_STRING, UPLOAD_FILES_DIR, PORT} = require("./constants/cosntants");
 var cors = require('cors');
 
 // All router imports
@@ -36,4 +36,4 @@ app.use('/quizzes', quizzesRouter);
 app.use('/classes', classesRouter);
 
 
-app.listen(8000);
+app.listen(PORT);

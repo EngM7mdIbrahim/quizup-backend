@@ -3,14 +3,17 @@ const app = express();
 const mongoose = require("mongoose");
 const multer = require('multer');
 const path = require('path')
-const {DB_CONN_STRING, DB_LOCAL_CONN_STRING, UPLOAD_FILES_DIR, PORT} = require("./constants/cosntants");
+const {DB_CONN_STRING, DB_LOCAL_CONN_STRING, UPLOAD_FILES_DIR, PORT, ALLOWED_DOMAINS} = require("./constants/cosntants");
 var cors = require('cors');
+const { Server } = require('socket.io');
 
 // All router imports
 const authRouter = require("./routes/auth.route.js");
 const quizzesRouter = require('./routes/quizzes.route');
 const classesRouter = require('./routes/classes.route.js');
 const { authAccessToken } = require("./constants/middleWares");
+const { GENERAL_CONNECTION } = require("./sockets/socket-actions");
+const { addTeacherHandlers } = require("./sockets/teacherHandler");
 
 //setup
 mongoose
@@ -36,4 +39,14 @@ app.use('/quizzes', quizzesRouter);
 app.use('/classes', classesRouter);
 
 
-app.listen(PORT);
+
+const runningRooms = [];
+const httpServer = app.listen(PORT);
+const io = new Server(httpServer, {
+  cors: {
+    origin: ALLOWED_DOMAINS
+  }})
+io.on(GENERAL_CONNECTION, socket=>{
+  console.log(socket.id);
+  addTeacherHandlers(socket, runningRooms);
+});

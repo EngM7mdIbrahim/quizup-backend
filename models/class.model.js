@@ -13,17 +13,20 @@ const classSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
     },
-    players: [{
-        name: {
-            type: String,
-            required: true,
-        },
-        score: {
-            type: Number,
-            required: true,
-            default: 0
-        },
-    }],
+    players: {
+        type: [{
+            name: {
+                type: String,
+                required: true,
+            },
+            score: {
+                type: Number,
+                required: true,
+                default: 0
+            },
+        }],
+        default: []
+    },
     createdAt: {
         type: Date,
         default: Date.now

@@ -15,7 +15,7 @@ const addOnTeacherJoinHandler = (socket, runningRooms) => {
       quizID
     );
 
-    const room = await addNewRoom(accessToken, quizID, runningRooms);
+    const [room, roomIndex] = await addNewRoom(accessToken, quizID, runningRooms);
     if (!room) {
       return;
     }
@@ -26,8 +26,10 @@ const addOnTeacherJoinHandler = (socket, runningRooms) => {
       );
       return;
     }
-    const roomURL = `${socket.request.header.origin}/student/${room.pin}`;
-    runningRooms.push({ teacherSocekt: socket, ...room });
+    const roomURL = `${socket.request.headers.origin}/student/${room.pin}`;
+    if (roomIndex === -1) {
+      runningRooms.push({ teacherSocekt: socket, ...room });
+    }
     socket.emit(ACK_SEND_PIN, { roomURL, pin: room.pin });
     console.log("Acknowledge Room Creation sent! PIN:", room.pin);
   });

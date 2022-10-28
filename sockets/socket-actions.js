@@ -1,6 +1,37 @@
 //GENERAL ACTIONS
-const GENERAL_CONNECTION = 'connection';
-const ON_SEND_PIN = 'teacher-join';
-const ACK_SEND_PIN  = 'teacher-join-ack';
+const GENERAL_CONNECTION = "connection";
+const TEACHER_ACK = "teacher-ack";
+const STUDENT_ACK = "teacher-ack";
+const TEACHER_ERR = 'teacher-err';
+const STUDENT_ERR = 'student-err';
 
-module.exports = {GENERAL_CONNECTION, SEND_PIN: ON_SEND_PIN, ACK_SEND_PIN}
+const STATUS = {
+  WAITING_FOR_PLAYERS: "waiting-players",
+  QUESTIONS_CHOICES: "choices",
+  QUESTIONS_TRUE_FALSE: "true-false",
+  SHOW_ANSWERS: "show-ans",
+  END_SESSION: "end-session",
+  WAITING_ANSWERS: "waiting-answers",
+};
+
+const TEACHER_ACTIONS = {
+  REQ_ROOM: "teacher-join",
+  REQUEST_UPDATE: "teacher-request-update-state",
+};
+
+const STUDENT_ACTIONS = {
+  JOIN_ROOM: "student-join",
+  REQUEST_UPDATE: "student-request-update-state",
+  SUBMIT_ANSWER: "student-submit-ans",
+};
+
+module.exports = {
+  GENERAL_CONNECTION,
+  TEACHER_ACK,
+  STUDENT_ACK,
+  STUDENT_ERR,
+  TEACHER_ERR,
+  STATUS,
+  TEACHER_ACTIONS,
+  STUDENT_ACTIONS,
+};

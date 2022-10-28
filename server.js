@@ -42,11 +42,19 @@ app.use('/classes', classesRouter);
 
 const runningRooms = [];
 const httpServer = app.listen(PORT);
+
 const io = new Server(httpServer, {
   cors: {
     origin: ALLOWED_DOMAINS
   }})
+
 io.on(GENERAL_CONNECTION, socket=>{
-  console.log(socket.id);
+  socket.on('disconnect', ()=>{
+    console.log(`Socket ${socket.id} is disconnected!`)
+  })
+  console.log('///////////START///////////////')
+  console.log('New Socket: ',socket.id);
+  console.log('Previous Sockets: ',Object.keys(io.of('/').sockets))
+  console.log('///////////END///////////////')
   addTeacherHandlers(socket, runningRooms);
 });

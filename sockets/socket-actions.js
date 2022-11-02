@@ -1,13 +1,14 @@
 //GENERAL ACTIONS
 const GENERAL_CONNECTION = "connection";
 const TEACHER_ACK = "teacher-ack";
-const STUDENT_ACK = "teacher-ack";
+const STUDENT_ACK = "student-ack";
 const TEACHER_ERR = 'teacher-err';
 const STUDENT_ERR = 'student-err';
 
 const STATUS = {
   WAITING_FOR_PLAYERS: "waiting-players",
   QUESTIONS_CHOICES: "choices",
+  WAITING_FOR_OTHERS_JOIN: 'waiting-others-join',
   QUESTIONS_TRUE_FALSE: "true-false",
   SHOW_ANSWERS: "show-ans",
   END_SESSION: "end-session",

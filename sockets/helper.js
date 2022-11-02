@@ -59,6 +59,11 @@ const createNewRoom = async (teacherID, socket, quizID, runningRooms) => {
   ];
 };
 
+const extractPin = (roomURL) =>{
+  const roomURLTokens = roomURL.split('/')
+  return roomURLTokens[roomURLTokens.length - 1];
+}
+
 const authorizeTeacher = (data)=>{
   const { accessToken} = data;
   let payload = {};
@@ -71,4 +76,4 @@ const authorizeTeacher = (data)=>{
   }
 }
 
-module.exports = { generateRandomPin, createNewRoom, authorizeTeacher};
+module.exports = { generateRandomPin, createNewRoom, authorizeTeacher, extractPin};

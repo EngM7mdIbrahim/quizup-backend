@@ -3,9 +3,11 @@ const {
   STUDENT_ACK,
   STUDENT_ERR,
   STATUS,
+  SERVER_CMDS
 } = require("./socket-actions");
 
-const { extractPin } = require("./helper");
+const { sendTeacherState} = require('./teacherHandler');
+const { extractPin, findPlayer } = require("./helper");
 
 //helper functions
 
@@ -40,12 +42,25 @@ const emitError = (socket, message, cmd) => {
 };
 
 const addOnStudentJoinHandler = (socket, runningRooms = []) => {
-  socket.on(STUDENT_ACTIONS.JOIN_ROOM, async (data) => {
+  socket.on(STUDENT_ACTIONS.JOIN_ROOM, async (data) => {    
     if (!data) {
       emitError(socket, "Received null value!");
       return;
     }
     const { pin, name } = data;
+    console.log('Received join request for room pin:', pin)
+    //Checking if the student has requested to join before?
+    const [currentRoomIndex, playerIndex] = findPlayer(runningRooms, socket.id);
+    if(currentRoomIndex !== -1){
+      sendStudentState(
+        socket,
+        runningRooms,
+        currentRoomIndex,
+        playerIndex,
+        STATUS.WAITING_FOR_OTHERS_JOIN
+      );
+      return;
+    }
     const roomIndex = runningRooms.findIndex(
       (room) => extractPin(room.roomURL) === pin
     );
@@ -61,6 +76,7 @@ const addOnStudentJoinHandler = (socket, runningRooms = []) => {
       ...runningRooms[roomIndex],
       players: [...runningRooms[roomIndex].players, newPlayer],
     };
+    sendTeacherState(runningRooms[roomIndex].teacherSocket, runningRooms, roomIndex);
     sendStudentState(
       socket,
       runningRooms,
@@ -73,15 +89,9 @@ const addOnStudentJoinHandler = (socket, runningRooms = []) => {
 
 const addOnStudentRequestUpdate = (socket, runningRooms = []) =>{
   socket.on(STUDENT_ACTIONS.REQUEST_UPDATE, (prevSocketID)=>{
-    let playerIndex = -1;
-    const currentRoomIndex = runningRooms.findIndex(room =>{
-      playerIndex = room.players.findIndex(player =>{
-        player.socketID = prevSocketID;
-      });
-      return playerIndex !== -1;
-    });
+    const [currentRoomIndex, playerIndex] = findPlayer(runningRooms, prevSocketID);
     if(currentRoomIndex === -1){
-      emitError(socket, 'Looks like you are back, but we are sorry! The last quiz you have joined has ended!');
+      emitError(socket, 'Looks like you are back, but we are sorry! The last quiz you have joined has ended!', SERVER_CMDS.deleteID);
       return;
     }
     runningRooms[currentRoomIndex].players[playerIndex].socketID = socket.id;
@@ -95,4 +105,4 @@ const addStudentHandlers = (socket, runningRooms) => {
   addOnStudentRequestUpdate(socket, runningRooms);
 };
 
-module.exports = { addStudentHandlers };
+module.exports = { addStudentHandlers, sendStudentState };

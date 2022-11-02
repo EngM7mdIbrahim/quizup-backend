@@ -15,6 +15,11 @@ const STATUS = {
   WAITING_ANSWERS: "waiting-answers",
 };
 
+const SERVER_CMDS = {
+  deleteID: 'DELETE_ID'
+}
+
+
 const TEACHER_ACTIONS = {
   REQ_ROOM: "teacher-join",
   REQUEST_UPDATE: "teacher-request-update-state",
@@ -35,4 +40,5 @@ module.exports = {
   STATUS,
   TEACHER_ACTIONS,
   STUDENT_ACTIONS,
+  SERVER_CMDS
 };

@@ -14,6 +14,7 @@ const classesRouter = require('./routes/classes.route.js');
 const { authAccessToken } = require("./constants/middleWares");
 const { GENERAL_CONNECTION } = require("./sockets/socket-actions");
 const { addTeacherHandlers } = require("./sockets/teacherHandler");
+const { addStudentHandlers } = require("./sockets/studentHandler");
 
 //setup
 mongoose
@@ -52,9 +53,10 @@ io.on(GENERAL_CONNECTION, socket=>{
   socket.on('disconnect', ()=>{
     console.log(`Socket ${socket.id} is disconnected!`)
   })
-  console.log('///////////START///////////////')
-  console.log('New Socket: ',socket.id);
-  console.log('Previous Sockets: ',Object.keys(io.of('/').sockets))
-  console.log('///////////END///////////////')
+  // console.log('///////////START///////////////')
+  // console.log('New Socket: ',socket.id);
+  // console.log('Previous Sockets: ',Object.keys(io.of('/').sockets))
+  // console.log('///////////END///////////////')
   addTeacherHandlers(socket, runningRooms);
+  addStudentHandlers(socket, runningRooms);
 });

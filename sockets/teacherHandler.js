@@ -3,6 +3,7 @@ const {
   TEACHER_ACK,
   TEACHER_ERR,
   STATUS,
+  STUDENT_ACK,
 } = require("./socket-actions");
 
 const { createNewRoom, authorizeTeacher, ROOM } = require("./helper");
@@ -73,7 +74,7 @@ const addOnTeacherJoinHandler = (socket, runningRooms) => {
   });
 };
 
-const addOnTeacherDeletePlayerHandler = (socket, runningRooms = [ROOM]) => {
+const addOnTeacherDeletePlayerHandler = (socket, runningRooms = [ROOM], io) => {
   socket.on(TEACHER_ACTIONS.DELETE_PLAYER, (data) => {
     if (!data) {
       socket.emit(
@@ -130,6 +131,8 @@ const addOnTeacherDeletePlayerHandler = (socket, runningRooms = [ROOM]) => {
       roomURL: runningRoom.roomURL,
     });
 
+    runningRooms[runningRoomIndex].players = runningRoom.players.filter((_,currIndex)=>index!==currIndex)
+    console.log('Running Rooms: ', runningRooms);
     sendTeacherState(socket, runningRooms, runningRoomIndex);
   });
 };

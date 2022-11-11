@@ -58,6 +58,6 @@ io.on(GENERAL_CONNECTION, (socket) => {
   // console.log('New Socket: ',socket.id);
   // console.log('Previous Sockets: ',Object.keys(io.of('/').sockets))
   // console.log('///////////END///////////////')
-  addTeacherHandlers(socket, runningRooms);
+  addTeacherHandlers(socket, runningRooms, io);
   addStudentHandlers(socket, runningRooms);
 });

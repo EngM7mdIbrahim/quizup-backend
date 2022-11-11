@@ -92,4 +92,5 @@ module.exports = {
   authorizeTeacher,
   extractPin,
   findPlayer,
+  ROOM
 };

@@ -13,6 +13,7 @@ const STATUS = {
   SHOW_ANSWERS: "show-ans",
   END_SESSION: "end-session",
   WAITING_ANSWERS: "waiting-answers",
+  DELETED_PLAYER: "player-deleted"
 };
 
 const SERVER_CMDS = {
@@ -23,6 +24,7 @@ const SERVER_CMDS = {
 const TEACHER_ACTIONS = {
   REQ_ROOM: "teacher-join",
   REQUEST_UPDATE: "teacher-request-update-state",
+  DELETE_PLAYER: 'teacher-delete-player',
 };
 
 const STUDENT_ACTIONS = {

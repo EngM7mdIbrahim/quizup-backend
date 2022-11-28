@@ -1,6 +1,6 @@
 const Quiz = require("../models/quiz.model");
 const jwt = require("jsonwebtoken");
-const { STATUS, TEACHER_ERR } = require("./socket-actions");
+const { STATUS, TEACHER_ERR, SCREEN_ACTIONS } = require("./socket-actions");
 
 const ROOM = {
   teacherID: undefined,
@@ -8,6 +8,7 @@ const ROOM = {
   players: [],
   questionNumber: 0,
   roomURL: "",
+  existingQuiz: null
 };
 
 const generateRandomPin = (runningRooms) => {
@@ -54,6 +55,7 @@ const createNewRoom = async (teacherID, socket, quizID, runningRooms) => {
       roomURL,
     },
     roomIndex,
+    existingQuiz
   ];
 };
 
@@ -74,6 +76,10 @@ const authorizeTeacher = (data) => {
   }
 };
 
+const checkIfTeacherScreensActions = (action, status) =>{
+  return SCREEN_ACTIONS[status][action]!== undefined || SCREEN_ACTIONS[status][action]!== null
+}
+
 const findPlayer = (runningRooms, socketID, searchCallback) => {
   let playerIndex = -1;
   let roomIndex = -1;
@@ -92,5 +98,6 @@ module.exports = {
   authorizeTeacher,
   extractPin,
   findPlayer,
+  checkIfTeacherScreensActions,
   ROOM
 };

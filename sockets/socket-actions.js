@@ -13,7 +13,8 @@ const STATUS = {
   SHOW_ANSWERS: "show-ans",
   END_SESSION: "end-session",
   WAITING_ANSWERS: "waiting-answers",
-  DELETED_PLAYER: "player-deleted"
+  DELETED_PLAYER: "player-deleted",
+  NULL: 'null-status'
 };
 
 const SERVER_CMDS = {
@@ -25,6 +26,7 @@ const TEACHER_ACTIONS = {
   REQ_ROOM: "teacher-join",
   REQUEST_UPDATE: "teacher-request-update-state",
   DELETE_PLAYER: 'teacher-delete-player',
+  START_GAME: 'teacher-start-game'
 };
 
 const STUDENT_ACTIONS = {
@@ -32,6 +34,16 @@ const STUDENT_ACTIONS = {
   REQUEST_UPDATE: "student-request-update-state",
   SUBMIT_ANSWER: "student-submit-ans",
 };
+
+const SCREEN_ACTIONS = {
+  [STATUS.NULL]:{
+    [TEACHER_ACTIONS.REQ_ROOM]: true,
+  },
+  [STATUS.WAITING_FOR_PLAYERS]:{
+    [TEACHER_ACTIONS.DELETE_PLAYER]: true,
+    [TEACHER_ACTIONS.START_GAME]: true,
+  }
+}
 
 module.exports = {
   GENERAL_CONNECTION,
@@ -42,5 +54,6 @@ module.exports = {
   STATUS,
   TEACHER_ACTIONS,
   STUDENT_ACTIONS,
-  SERVER_CMDS
+  SERVER_CMDS,
+  SCREEN_ACTIONS
 };

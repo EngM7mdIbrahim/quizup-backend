@@ -6,7 +6,7 @@ const {
   STUDENT_ACK,
 } = require("./socket-actions");
 
-const { createNewRoom, authorizeTeacher, ROOM } = require("./helper");
+const { createNewRoom, authorizeTeacher, ROOM, checkIfTeacherScreensActions } = require("./helper");
 
 //helper functions
 const sendTeacherState = (socket, runningRooms, roomIndex, status) => {
@@ -14,12 +14,14 @@ const sendTeacherState = (socket, runningRooms, roomIndex, status) => {
   socket.emit(TEACHER_ACK, {
     ...room,
     status: status ? status : room.status,
-    teacherSocket: null,
+    teacherSocket: undefined,
+    existingQuiz: undefined,
   });
 };
 
 const addOnTeacherJoinHandler = (socket, runningRooms) => {
-  socket.on(TEACHER_ACTIONS.REQ_ROOM, async (data) => {
+  const action = TEACHER_ACTIONS.REQ_ROOM;
+  socket.on(action, async (data) => {
     if (!data) {
       socket.emit(
         TEACHER_ERR,
@@ -42,7 +44,14 @@ const addOnTeacherJoinHandler = (socket, runningRooms) => {
       "Received new class room creation request with this following id. ID: ",
       quizID
     );
-
+    if(!checkIfTeacherScreensActions(action, STATUS.NULL)){
+      console.log("Received a non screen action! ", data);
+      socket.emit(
+        TEACHER_ERR,
+        "This action is not part of your current screen!"
+      );
+      return;
+    }
     const [room, roomIndex] = await createNewRoom(
       teacherID,
       socket,
@@ -75,7 +84,8 @@ const addOnTeacherJoinHandler = (socket, runningRooms) => {
 };
 
 const addOnTeacherDeletePlayerHandler = (socket, runningRooms = [ROOM], io) => {
-  socket.on(TEACHER_ACTIONS.DELETE_PLAYER, (data) => {
+  const action = TEACHER_ACTIONS.DELETE_PLAYER
+  socket.on(action, (data) => {
     if (!data) {
       socket.emit(
         TEACHER_ERR,
@@ -116,7 +126,14 @@ const addOnTeacherDeletePlayerHandler = (socket, runningRooms = [ROOM], io) => {
       return;
     }
     const runningRoom = runningRooms[runningRoomIndex];
-
+    if(!checkIfTeacherScreensActions(action, runningRoom.status)){
+      console.log("Received a non screen action! ", data);
+      socket.emit(
+        TEACHER_ERR,
+        "This action is not part of your current screen!"
+      );
+      return;
+    }
     const player = runningRoom.players[index];
     if (!player) {
       console.log("Requested to delete a player that doesn't exist anymore!");
@@ -137,9 +154,14 @@ const addOnTeacherDeletePlayerHandler = (socket, runningRooms = [ROOM], io) => {
   });
 };
 
+const addOnTeacherNextQuestionHandler = (socket, runningRooms = [ROOM]) =>{
+  
+}
+
 const addTeacherHandlers = (socket, runningRooms, io) => {
   addOnTeacherJoinHandler(socket, runningRooms);
   addOnTeacherDeletePlayerHandler(socket, runningRooms, io);
+  addOnTeacherNextQuestionHandler(socket, runningRooms)
 };
 
 module.exports = { addTeacherHandlers, sendTeacherState };

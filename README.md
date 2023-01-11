@@ -1,6 +1,6 @@
 # QuizUp
 
-**Tech Used:** ReactJS, Express, Node, MongoDB
+**Tech Used:** ReactJS, Express, Node, MongoDB, Redux, Websocket
 
 **About:** 
 

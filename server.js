@@ -6,7 +6,7 @@ const path = require("path");
 const {
   DB_CONN_STRING,
   DB_LOCAL_CONN_STRING,
-  UPLOAD_FILES_DIR,
+  DB_MONGO_DB,
   PORT,
   ALLOWED_DOMAINS,
 } = require("./constants/cosntants");
@@ -24,7 +24,7 @@ const { addStudentHandlers } = require("./sockets/studentHandler");
 
 //setup
 mongoose
-  .connect(DB_LOCAL_CONN_STRING)
+  .connect(DB_MONGO_DB)
   .then(() => console.log("Connected to DB!"))
   .catch((err) =>
     console.error("Cannot connect to the DB with the following error: ", err)

@@ -9,6 +9,8 @@ const UPLOAD_FILES_BASE_URL = `http://${HOST}:${PORT}/uploads/`;
 
 const DB_CONN_STRING = `mongodb://${DB_USERNAME}:${DB_PASS}@${HOST}:${DB_PORT}/${DB_NAME}`;
 const DB_LOCAL_CONN_STRING = `mongodb://${HOST}:${DB_PORT}/${DB_NAME}`;
+const DB_MONGO_DB = 'mongodb+srv://demo-app:pVpTwAZYPUHmUWvI@demoapps.n6vswdd.mongodb.net/?retryWrites=true&w=majority';
+
 
 //Socket Settings
 const ALLOWED_DOMAINS = "*";
@@ -20,4 +22,5 @@ module.exports = {
   PORT,
   UPLOAD_FILES_BASE_URL,
   ALLOWED_DOMAINS,
+  DB_MONGO_DB
 };
